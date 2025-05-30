@@ -1,88 +1,97 @@
 <template>
   <form @submit.prevent="handleSubmit" class="register-form">
-    <div class="form-group">
-      <label for="firstName">Имя*</label>
-      <input
-        type="text"
-        id="firstName"
-        v-model="formData.first_name"
-        required
-        placeholder="Введите имя"
-      />
+    <div class="form-grid">
+      <!-- Первая колонка -->
+      <div class="form-column">
+        <div class="form-group">
+          <label for="firstName">Имя*</label>
+          <input
+            type="text"
+            id="firstName"
+            v-model="formData.first_name"
+            required
+            placeholder="Введите имя"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Фамилия*</label>
+          <input
+            type="text"
+            id="lastName"
+            v-model="formData.last_name"
+            required
+            placeholder="Введите фамилию"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="secondName">Отчество</label>
+          <input
+            type="text"
+            id="secondName"
+            v-model="formData.second_name"
+            placeholder="Введите отчество (если есть)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email*</label>
+          <input
+            type="email"
+            id="email"
+            v-model="formData.email"
+            required
+            placeholder="example@mail.com"
+          />
+        </div>
+      </div>
+
+      <!-- Вторая колонка -->
+      <div class="form-column">
+        <div class="form-group">
+          <label for="phone">Телефон*</label>
+          <input
+            type="tel"
+            id="phone"
+            v-model="formData.phone"
+            required
+            placeholder="+7 (XXX) XXX-XX-XX"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Пароль*</label>
+          <input
+            type="password"
+            id="password"
+            v-model="formData.password"
+            required
+            placeholder="Не менее 6 символов"
+            minlength="6"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="passwordConfirmation">Подтверждение пароля*</label>
+          <input
+            type="password"
+            id="passwordConfirmation"
+            v-model="formData.password_confirmation"
+            required
+            placeholder="Повторите пароль"
+            minlength="6"
+          />
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="lastName">Фамилия*</label>
-      <input
-        type="text"
-        id="lastName"
-        v-model="formData.last_name"
-        required
-        placeholder="Введите фамилию"
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="secondName">Отчество</label>
-      <input
-        type="text"
-        id="secondName"
-        v-model="formData.second_name"
-        placeholder="Введите отчество (если есть)"
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email*</label>
-      <input
-        type="email"
-        id="email"
-        v-model="formData.email"
-        required
-        placeholder="example@mail.com"
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="phone">Телефон*</label>
-      <input
-        type="tel"
-        id="phone"
-        v-model="formData.phone"
-        required
-        placeholder="+7 (XXX) XXX-XX-XX"
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="password">Пароль*</label>
-      <input
-        type="password"
-        id="password"
-        v-model="formData.password"
-        required
-        placeholder="Не менее 6 символов"
-        minlength="6"
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="passwordConfirmation">Подтверждение пароля*</label>
-      <input
-        type="password"
-        id="passwordConfirmation"
-        v-model="formData.password_confirmation"
-        required
-        placeholder="Повторите пароль"
-        minlength="6"
-      />
-    </div>
-
-    <div class="form-group">
+    <!-- Специализации (полная ширина) -->
+    <div class="form-group full-width">
       <label>Специализации*</label>
       <div class="specializations-list">
         <div
-          v-for="spec in availableSpecializations.data"
+          v-for="spec in availableSpecializations"
           :key="spec.id"
           class="specialization-item"
         >
@@ -157,10 +166,26 @@ const handleSubmit = async () => {
   gap: 1rem;
 }
 
+.form-grid {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.form-group.full-width {
+  width: 100%;
 }
 
 label {
@@ -210,5 +235,12 @@ input[type="password"] {
 .submit-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
 </style>

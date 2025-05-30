@@ -11,9 +11,13 @@ export interface User {
 export interface Client {
   id: number
   user_id: number
-  first_name: string
-  last_name: string
-  phone: string
+  first_name: string,
+  last_name: string,
+  second_name: string,
+  phone: string,
+  birth_date: string,
+  notes: string,
+  // preferences: string,
   email: string
 }
 

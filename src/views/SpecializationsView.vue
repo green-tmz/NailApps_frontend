@@ -204,7 +204,7 @@ const confirmDeleteAction = async () => {
 
   try {
     isDeleting.value = true
-    await specializationsStore.deleteSpecialization(specializationToDelete.value)
+    await specializationsStore.removeSpecialization(specializationToDelete.value)
     showDeleteConfirm.value = false
   } catch (err) {
     error.value = 'Не удалось удалить специализацию. Пожалуйста, попробуйте позже.'

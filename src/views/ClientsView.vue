@@ -1,7 +1,5 @@
 <template>
   <div class="clients-view">
-    <AppHeader title="Клиенты" />
-
     <div class="actions">
       <button @click="showAddClientModal = true">Добавить клиента</button>
     </div>
@@ -20,15 +18,15 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useClientsStore } from '@/stores/clients'
-import AppHeader from '@/components/common/AppHeader.vue'
 import ClientsList from '@/components/clients/ClientsList.vue'
 import ClientForm from '@/components/clients/ClientForm.vue'
+import type { Client } from '@/types'
 
 const clientsStore = useClientsStore()
 const clients = computed(() => clientsStore.clients)
 
 const showAddClientModal = ref(false)
-const editingClient = ref<never>(null)
+const editingClient = ref<Client | null>(null)
 
 onMounted(async () => {
   await clientsStore.fetchClients()
