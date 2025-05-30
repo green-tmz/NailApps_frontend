@@ -15,8 +15,17 @@ const router = createRouter({
           path: '/dashboard',
           name: 'dashboard',
           component: () => import('@/views/DashboardView.vue'),
-          // meta: { requiresAuth: true },
-        }
+        },
+        {
+          path: '/specializations',
+          name: 'specializations',
+          component: () => import('@/views/SpecializationsView.vue'),
+        },
+        // {
+        //   path: '/clients',
+        //   name: 'clients',
+        //   component: () => import('@/views/ClientsView.vue'),
+        // },
       ]
     },
     {
@@ -32,12 +41,6 @@ const router = createRouter({
       meta: { requiresGuest: true }
     },
     // {
-    //   path: '/clients',
-    //   name: 'clients',
-    //   component: () => import('@/views/ClientsView.vue'),
-    //   meta: { requiresAuth: true }
-    // },
-    // {
     //   path: '/masters',
     //   name: 'masters',
     //   component: () => import('@/views/MastersView.vue'),
@@ -47,12 +50,6 @@ const router = createRouter({
     //   path: '/services',
     //   name: 'services',
     //   component: () => import('@/views/ServicesView.vue'),
-    //   meta: { requiresAuth: true }
-    // },
-    // {
-    //   path: '/specializations',
-    //   name: 'specializations',
-    //   component: () => import('@/views/SpecializationsView.vue'),
     //   meta: { requiresAuth: true }
     // },
     {

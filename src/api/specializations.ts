@@ -3,7 +3,7 @@ import type { Specialization } from '@/types'
 
 export const fetchSpecializations = async (): Promise<Specialization[]> => {
   const response = await api.get('/specializations')
-  return response.data
+  return response.data.data
 }
 
 export const createSpecialization = async (data: { name: string }): Promise<Specialization> => {
