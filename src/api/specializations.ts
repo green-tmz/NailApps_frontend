@@ -6,14 +6,14 @@ export const fetchSpecializations = async (): Promise<Specialization[]> => {
   return response.data.data
 }
 
-export const createSpecialization = async (data: { name: string }): Promise<Specialization> => {
-  const response = await api.post('/specializations', data)
-  return response.data
+export const createSpecialization = async (name: string): Promise<Specialization> => {
+  const response = await api.post('/specializations', name)
+  return response.data.data
 }
 
-export const updateSpecialization = async (id: number, data: { name: string }): Promise<Specialization> => {
-  const response = await api.put('/specializations/'+id, data)
-  return response.data
+export const updateSpecialization = async (id: number, name: string): Promise<Specialization> => {
+  const response = await api.put('/specializations/'+id, name)
+  return response.data.data
 }
 
 export const deleteSpecialization = async (id: number): Promise<void> => {

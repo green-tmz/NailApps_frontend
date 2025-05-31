@@ -34,10 +34,10 @@ export const useSpecializationsStore = defineStore('specializations', {
         this.isLoading = false
       }
     },
-    async addSpecialization(name: string) {
+    async createSpecialization(name: string) {
       try {
         this.isLoading = true
-        const newSpec = await createSpecialization({ name })
+        const newSpec = await createSpecialization(name)
         this.specializations.push(newSpec)
         this.error = null
         return newSpec
@@ -52,7 +52,7 @@ export const useSpecializationsStore = defineStore('specializations', {
     async updateSpecialization(id: number, name: string) {
       try {
         this.isLoading = true
-        const updatedSpec = await updateSpecialization(id, { name })
+        const updatedSpec = await updateSpecialization(id, name)
         const index = this.specializations.findIndex(spec => spec.id === id)
         if (index !== -1) {
           this.specializations.splice(index, 1, updatedSpec)
