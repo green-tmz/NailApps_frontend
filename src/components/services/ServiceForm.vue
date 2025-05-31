@@ -68,6 +68,17 @@
             </div>
           </div>
 
+          <!-- Добавленное поле описания -->
+          <div class="form-group full-width">
+            <label for="description">Описание</label>
+            <textarea
+              id="description"
+              v-model="formData.description"
+              placeholder="Дополнительное описание услуги"
+              rows="3"
+            ></textarea>
+          </div>
+
           <div class="form-actions">
             <button type="button" @click="close" class="cancel-button">Отмена</button>
             <button type="submit" :disabled="isSubmitting" class="submit-button">
@@ -99,7 +110,8 @@ const formData = ref({
   specialization_id: '',
   duration: 30,
   price: 0,
-  masterId: 1 // По умолчанию, можно сделать выбор мастера
+  description: '', // Добавленное поле
+  masterId: 1
 })
 
 const isSubmitting = ref(false)
@@ -115,6 +127,7 @@ watch(() => props.service, (newService) => {
       specialization_id: newService.specialization_id,
       duration: newService.duration,
       price: newService.price,
+      description: newService.description || '', // Добавленное поле
       masterId: newService.masterId || 1
     }
   } else {
@@ -123,6 +136,7 @@ watch(() => props.service, (newService) => {
       specialization_id: '',
       duration: 30,
       price: 0,
+      description: '', // Добавленное поле
       masterId: 1
     }
   }
@@ -213,7 +227,8 @@ const close = () => {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
@@ -222,9 +237,19 @@ const close = () => {
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #4a6baf;
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .form-actions {
@@ -269,6 +294,10 @@ const close = () => {
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: span 1;
   }
 
   .modal-content {
