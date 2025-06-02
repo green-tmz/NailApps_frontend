@@ -14,7 +14,7 @@ export const login = async (data: LoginData) => {
     const response = await api.post('/auth/login', data)
     return {
       token: response.data.data.token,
-      user: response.data.data.master
+      user: response.data.data.user
     }
   } catch (error) {
     // Можно добавить кастомную обработку ошибок аутентификации
@@ -27,7 +27,7 @@ export const register = async (data: RegisterData) => {
     const response = await api.post('/auth/register', data)
     return {
       token: response.data.data.token,
-      user: response.data.data.master
+      user: response.data.data.user
     }
   } catch (error) {
     // Можно добавить кастомную обработку ошибок аутентификации
@@ -42,7 +42,7 @@ export const logout = async () => {
 export const getMe = async (): Promise<User> => {
   try {
     const response = await api.get('/auth/me')
-    return response.data
+    return response.data.data
   } catch (error) {
     // Можно добавить кастомную обработку ошибок аутентификации
     throw error
