@@ -1,47 +1,34 @@
 <template>
-  <div class="auth-container">
-    <div class="auth-card">
-      <h2>404 Страница не найдена</h2>
+  <div class="relative flex flex-col items-center justify-center min-h-screen p-6 overflow-hidden z-1">
+    <common-grid-shape />
+    <div class="mx-auto w-full max-w-[242px] text-center sm:max-w-[472px]">
+      <h1 class="mb-8 font-bold text-gray-800 text-title-md dark:text-white/90 xl:text-title-2xl">
+        Ошибка
+      </h1>
 
-      <p style="text-align: center; color: black;">Извините, эта страница не найдена</p>
+      <img src="/images/error/404.svg" alt="404" class="dark:hidden" />
+      <img src="/images/error/404-dark.svg" alt="404" class="hidden dark:block" />
+
+      <p class="mt-10 mb-6 text-base text-gray-700 dark:text-gray-400 sm:text-lg">
+        Страница не найдена!
+      </p>
+
+      <router-link to="/" class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+        Вернуться назад
+      </router-link>
     </div>
+    <!-- Footer -->
+    <p
+      class="absolute text-sm text-center text-gray-500 -translate-x-1/2 bottom-6 left-1/2 dark:text-gray-400"
+    >
+      &copy; {{ currentYear }} - TailAdmin
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+import CommonGridShape from "@/components/common/CommonGridShape.vue";
 
+const currentYear = ref(new Date().getFullYear());
 </script>
-
-<style scoped>
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f5f5f5;
-}
-
-.auth-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  margin: 2rem 0;
-}
-
-h2 {
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #333;
-}
-
-button {
-  background: none;
-  border: none;
-  color: #4a6baf;
-  cursor: pointer;
-  text-decoration: underline;
-}
-</style>

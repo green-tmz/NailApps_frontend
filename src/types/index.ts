@@ -9,8 +9,6 @@ export interface User {
 }
 
 export interface Client {
-  id: number
-  user_id: number
   first_name: string,
   last_name: string,
   second_name: string,
@@ -42,7 +40,8 @@ export interface Service {
 
 export interface LoginData {
   login: string
-  password: string
+  password: string,
+  keepLoggedIn: boolean
 }
 
 export interface RegisterData {
@@ -53,5 +52,6 @@ export interface RegisterData {
   phone: string
   password: string
   password_confirmation: string
-  specializationId: number[]
+  specializationId: number[],
+  agreeToTerms: boolean
 }

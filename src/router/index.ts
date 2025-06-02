@@ -3,10 +3,12 @@ import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition || { left: 0, top: 0 }
+  },
   routes: [
     {
       path: '/',
-      name: 'home',
       component: () => import('@/layouts/DefaultLayout.vue'),
       redirect: '/dashboard',
       meta: { requiresAuth: true },
@@ -15,6 +17,11 @@ const router = createRouter({
           path: '/dashboard',
           name: 'dashboard',
           component: () => import('@/views/DashboardView.vue'),
+        },
+        {
+          path: '/calendar',
+          name: 'Calendar',
+          component: () => import('@/views/CalendarView.vue'),
         },
         {
           path: '/specializations',
@@ -34,17 +41,28 @@ const router = createRouter({
       ]
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/AuthView.vue'),
-      meta: { requiresGuest: true }
+      path: '/',
+      component: () => import('@/layouts/AuthLayout.vue'),
+      redirect: '/login',
+      meta: { requiresGuest: true },
+      children: [
+        {
+          path: '/login',
+          name: 'login',
+          component: () => import('@/components/auth/LoginForm.vue'),
+        },
+        {
+          path: '/register',
+          name: 'register',
+          component: () => import('@/components/auth/RegisterForm.vue'),
+        },
+      ]
     },
     {
-      path: '/register',
-      name: 'register',
-      component: () => import('@/views/AuthView.vue'),
-      meta: { requiresGuest: true }
-    },
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue')
+    }
     // {
     //   path: '/masters',
     //   name: 'masters',
@@ -57,11 +75,6 @@ const router = createRouter({
     //   component: () => import('@/views/ServicesView.vue'),
     //   meta: { requiresAuth: true }
     // },
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: () => import('@/views/NotFoundView.vue')
-    }
   ]
 })
 

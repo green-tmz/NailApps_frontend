@@ -1,190 +1,230 @@
 <template>
-  <div class="clients-list">
-    <div v-if="clients.length == 0" class="empty-state">
-      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-      </svg>
-      <p>Нет добавленных клиентов</p>
-    </div>
-
-    <div v-else class="list-container">
-      <div class="list-header">
-        <div class="header-item name">Имя</div>
-        <div class="header-item phone">Телефон</div>
-        <div class="header-item email">Email</div>
-        <div class="header-item actions">Действия</div>
-      </div>
-
-      <div v-for="client in clients" :key="client.id" class="client-item">
-        <div class="client-name">{{ client.first_name }} {{ client.last_name }}</div>
-        <div class="client-phone">{{ formatPhone(client.phone) }}</div>
-        <div class="client-email">{{ client.email }}</div>
-        <div class="client-actions">
-          <button @click="$emit('edit', client)" class="icon-button edit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-          </button>
-          <button @click="$emit('delete', client.id)" class="icon-button delete">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
+  <div class="space-y-5 sm:space-y-6">
+    <ComponentCard title="Клиенты">
+      <BasicTableOne :clients="clients" @edit="handleEditClient" @delete="handleDeleteClient" />
+    </ComponentCard>
   </div>
+
+  <Modal v-if="showEditClientModal" @close="showEditClientModal = false">
+    <template #body>
+      <div class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+        <!-- close btn -->
+        <button @click="showEditClientModal = false" class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300">
+          <svg
+            class="fill-current"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M6.04289 16.5418C5.65237 16.9323 5.65237 17.5655 6.04289 17.956C6.43342 18.3465 7.06658 18.3465 7.45711 17.956L11.9987 13.4144L16.5408 17.9565C16.9313 18.347 17.5645 18.347 17.955 17.9565C18.3455 17.566 18.3455 16.9328 17.955 16.5423L13.4129 12.0002L17.955 7.45808C18.3455 7.06756 18.3455 6.43439 17.955 6.04387C17.5645 5.65335 16.9313 5.65335 16.5408 6.04387L11.9987 10.586L7.45711 6.04439C7.06658 5.65386 6.43342 5.65386 6.04289 6.04439C5.65237 6.43491 5.65237 7.06808 6.04289 7.4586L10.5845 12.0002L6.04289 16.5418Z"
+              fill=""
+            />
+          </svg>
+        </button>
+        <div class="px-2 pr-14">
+          <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            Редактировать клиента
+          </h4>
+        </div>
+        <form class="flex flex-col" @submit.prevent="handleSubmitClient">
+          <div class="px-2 overflow-y-auto custom-scrollbar">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
+              <div>
+                <label for="first_name" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Имя<span class="text-error-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="first_name"
+                  v-model="formData.first_name"
+                  required
+                  placeholder="Введите имя"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+
+              <div>
+                <label for="last_name" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Фамилия
+                </label>
+                <input
+                  type="text"
+                  id="last_name"
+                  v-model="formData.last_name"
+                  placeholder="Введите фамилию"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+
+              <div>
+                <label for="second_name" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Отчество
+                </label>
+                <input
+                  type="text"
+                  id="second_name"
+                  v-model="formData.second_name"
+                  placeholder="Введите отчество"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+
+              <div>
+                <label for="phone" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Телефон<span class="text-error-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  id="phone"
+                  v-model="formData.phone"
+                  v-mask="'+7(###)###-##-##'"
+                  placeholder="+7(___)___-__-__"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+
+              <div>
+                <label for="email" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Email
+                </label>
+                <input
+                  type="text"
+                  id="email"
+                  v-model="formData.email"
+                  placeholder="Введите email"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+
+              <div>
+                <label for="birth_date" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Дата рождения
+                </label>
+                <flat-pickr
+                  v-model="formData.birth_date"
+                  :config="flatpickrConfig"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                  placeholder="Выберите дату"
+                />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1">
+              <div>
+                <label for="notes" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  Примечания
+                </label>
+                <textarea
+                  type="text"
+                  id="notes"
+                  v-model="formData.notes"
+                  rows="30"
+                  placeholder="Примечания"
+                  class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 mt-6 lg:justify-end">
+            <button
+              @click="showEditClientModal = false"
+              type="button"
+              class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
+            >
+              Закрыть
+            </button>
+            <button
+              type="submit"
+              class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
+            >
+              Сохранить
+            </button>
+          </div>
+        </form>
+      </div>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
+import { ref} from 'vue'
 import type { Client } from '@/types'
+import ComponentCard from "@/components/common/ComponentCard.vue";
+import BasicTableOne from "./Table.vue";
+import { useClientsStore } from '@/stores/clients'
+import { useQuasar } from 'quasar'
+import { useToast } from 'vue-toastification'
+import Modal from '@/components/clients/ClientForm.vue'
+import flatPickr from 'vue-flatpickr-component'
+
+import 'flatpickr/dist/flatpickr.css'
+
+const $q = useQuasar()
+const toast = useToast()
+const editingClient = ref<Client | null>(null)
 
 defineProps<{
   clients: Client[]
 }>()
 
-defineEmits(['edit', 'delete'])
+const formData = ref<Client>({
+  first_name: '',
+  last_name: '',
+  second_name: '',
+  phone: '',
+  birth_date: '',
+  notes: '',
+  // preferences: '',
+  email: ''
+})
 
-const formatPhone = (phone: string) => {
-  if (!phone) return ''
-  // Простое форматирование телефона
-  return phone.replace(/(\d{1})(\d{3})(\d{3})(\d{2})(\d{2})/, '+$1 ($2) $3-$4-$5')
+const flatpickrConfig = {
+  dateFormat: 'd.m.Y',
+  altInput: true,
+  altFormat: 'd.m.Y',
+  wrap: true,
+}
+
+const showEditClientModal = ref(false)
+
+const clientsStore = useClientsStore()
+
+const handleEditClient = (client: any) => {
+  formData.value = { ...client }
+  showEditClientModal.value = true
+}
+
+const handleSubmitClient = async () => {
+  try {
+    await clientsStore.updateClient(formData.value.id, formData.value)
+    formData.value = ""
+    showEditClientModal.value = false
+    toast.success("Клиент успешно добавлен");
+  } catch (e) {
+    toast.error("Упс! Что-то пошло не так");
+  }
+}
+
+const handleDeleteClient = (id: number) => {
+  $q.dialog({
+    title: 'Удаление клиента',
+    message: 'Вы уверены, что хотите удалить этого клиента?',
+    ok: { label: 'Удалить', color: 'negative' },
+    cancel: { label: 'Отмена', flat: true },
+    persistent: true
+  }).onOk( async () => {
+    try {
+      await clientsStore.deleteClient(id)
+      toast.success("Клиент успешно удален");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      toast.error("Упс! Что-то пошло не так");
+    }
+  })
 }
 </script>
-
-<style scoped>
-.clients-list {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  color: #666;
-  text-align: center;
-}
-
-.empty-state svg {
-  margin-bottom: 1rem;
-  color: #ccc;
-}
-
-.list-container {
-  border: 1px solid #eee;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.list-header {
-  display: grid;
-  grid-template-columns: 2fr 2fr 2fr 1fr;
-  background-color: #f5f7fa;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #eee;
-  color: #4a6baf;
-  font-weight: bold;
-}
-
-.header-item {
-  padding: 0.5rem;
-}
-
-.client-item {
-  display: grid;
-  grid-template-columns: 2fr 2fr 2fr 1fr;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s;
-  color: #4a6baf;
-}
-
-.client-item:hover {
-  background-color: #f9f9f9;
-}
-
-.client-name,
-.client-phone,
-.client-email {
-  padding: 0.5rem;
-  display: flex;
-  align-items: center;
-}
-
-.client-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  padding: 0.5rem;
-}
-
-.icon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-button.edit {
-  color: #4a6baf;
-}
-
-.icon-button.edit:hover {
-  background-color: rgba(74, 107, 175, 0.1);
-}
-
-.icon-button.delete {
-  color: #e74c3c;
-}
-
-.icon-button.delete:hover {
-  background-color: rgba(231, 76, 60, 0.1);
-}
-
-@media (max-width: 768px) {
-  .list-header {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .client-item {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "name phone"
-      "email actions";
-    gap: 0.5rem;
-  }
-
-  .client-name {
-    grid-area: name;
-  }
-
-  .client-phone {
-    grid-area: phone;
-  }
-
-  .client-email {
-    grid-area: email;
-  }
-
-  .client-actions {
-    grid-area: actions;
-    justify-content: flex-start;
-  }
-}
-</style>
