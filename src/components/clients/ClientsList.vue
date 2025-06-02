@@ -157,16 +157,14 @@ import type { Client } from '@/types'
 import ComponentCard from "@/components/common/ComponentCard.vue";
 import BasicTableOne from "./Table.vue";
 import { useClientsStore } from '@/stores/clients'
-import { useQuasar } from 'quasar'
+import Swal from 'sweetalert2';
 import { useToast } from 'vue-toastification'
 import Modal from '@/components/clients/ClientForm.vue'
 import flatPickr from 'vue-flatpickr-component'
 
 import 'flatpickr/dist/flatpickr.css'
 
-const $q = useQuasar()
 const toast = useToast()
-const editingClient = ref<Client | null>(null)
 
 defineProps<{
   clients: Client[]
@@ -211,20 +209,24 @@ const handleSubmitClient = async () => {
 }
 
 const handleDeleteClient = (id: number) => {
-  $q.dialog({
+  Swal.fire({
     title: 'Удаление клиента',
-    message: 'Вы уверены, что хотите удалить этого клиента?',
-    ok: { label: 'Удалить', color: 'negative' },
-    cancel: { label: 'Отмена', flat: true },
-    persistent: true
-  }).onOk( async () => {
-    try {
-      await clientsStore.deleteClient(id)
-      toast.success("Клиент успешно удален");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      toast.error("Упс! Что-то пошло не так");
+    text: "Вы уверены, что хотите удалить этого клиента?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Да'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await clientsStore.deleteClient(id)
+        toast.success("Клиент успешно удален");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        toast.error("Упс! Что-то пошло не так");
+      }
     }
-  })
+  });
 }
 </script>

@@ -4,10 +4,7 @@ import App from './App.vue'
 import router from './router'
 import Toast from 'vue-toastification';
 import VueTheMask from 'vue-the-mask';
-import { Dialog, Quasar } from 'quasar'
 
-// import '@quasar/extras/material-icons/material-icons.css'
-import 'quasar/src/css/index.sass'
 import 'vue-toastification/dist/index.css';
 import './assets/main.css'
 import 'swiper/css'
@@ -25,11 +22,7 @@ app.use(Toast, {
   hideProgressBar: true,
   newestOnTop: true
 })
-app.use(Quasar, {
-  plugins: {
-    Dialog // активируем плагин Dialog
-  },
-})
+
 app.use(VueTheMask)
 
 app.mount('#app')
