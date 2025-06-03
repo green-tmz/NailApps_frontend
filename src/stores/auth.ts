@@ -71,7 +71,7 @@ export const useAuthStore = defineStore("auth", {
         this.token = null;
         localStorage.removeItem("na_token");
         localStorage.removeItem("na_user");
-        console.error("Fetch user error:", error);
+        await logout();
       }
     },
   },

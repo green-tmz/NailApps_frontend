@@ -91,23 +91,13 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
-  if (authStore.token && !authStore.user) {
-    try {
-      await authStore.fetchUser();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      await authStore.logout();
-      return { name: 'login' };
-    }
-  }
-
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login' }
   }
 
   if (to.meta.requiredRoles) {
     await authStore.fetchUser()
-    const userRole = JSON.parse(authStore.user);
+    const userRole = JSON.parse(<string>localStorage.getItem("na_user"));
     if (!userRole || !to.meta.requiredRoles.includes(userRole.role)) {
       return { name: 'forbidden' };
     }

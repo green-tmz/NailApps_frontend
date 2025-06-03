@@ -44,7 +44,6 @@ export const getMe = async (): Promise<User> => {
     const response = await api.get('/auth/me')
     return response.data.data
   } catch (error) {
-    // Можно добавить кастомную обработку ошибок аутентификации
     throw error
   }
 }
