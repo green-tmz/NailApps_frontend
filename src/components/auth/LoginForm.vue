@@ -190,6 +190,10 @@ const handleSubmit = async () => {
     await router.push({ name: 'dashboard' })
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (err) {
+    if (err.status === 422) {
+      toast.error(err.response.data.message);
+      return;
+    };
     toast.error("Упс! Что-то пошло не так");
   } finally {
     isSubmitting.value = false
