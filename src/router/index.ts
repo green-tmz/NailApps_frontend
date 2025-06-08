@@ -17,31 +17,46 @@ const router = createRouter({
           path: '/dashboard',
           name: 'dashboard',
           component: () => import('@/views/DashboardView.vue'),
-          meta: { requiredRoles: ['master', 'admin'] }
+          meta: {
+            requiredRoles: ['master', 'admin'],
+            requiredPermission: 'view dashboard'
+          }
         },
         {
           path: '/calendar',
           name: 'Calendar',
           component: () => import('@/views/CalendarView.vue'),
-          meta: { requiredRoles: ['master', 'admin'] }
+          meta: {
+            requiredRoles: ['master', 'admin'],
+            requiredPermission: 'view calendar'
+          }
         },
         {
           path: '/specializations',
           name: 'specializations',
           component: () => import('@/views/SpecializationsView.vue'),
-          meta: { requiredRoles: ['master', 'admin'] }
+          meta: {
+            requiredRoles: ['master', 'admin'],
+            requiredPermission: 'view specializations'
+          }
         },
         {
           path: '/clients',
           name: 'clients',
           component: () => import('@/views/ClientsView.vue'),
-          meta: { requiredRoles: ['master', 'admin'] }
+          meta: {
+            requiredRoles: ['master', 'admin'],
+            requiredPermission: 'view clients'
+          }
         },
         {
           path: '/services',
           name: 'services',
           component: () => import('@/views/ServicesView.vue'),
-          meta: { requiredRoles: ['master', 'admin'] }
+          meta: {
+            requiredRoles: ['master', 'admin'],
+            requiredPermission: 'view services'
+          }
         },
         {
           path: '/forbidden',
@@ -97,8 +112,16 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiredRoles) {
     await authStore.fetchUser()
-    const userRole = JSON.parse(<string>localStorage.getItem("na_user"));
-    if (!userRole || !to.meta.requiredRoles.includes(userRole.role)) {
+    const user = JSON.parse(localStorage.getItem("na_user") || "{}");
+    if (!user || !to.meta.requiredRoles.includes(user.role)) {
+      return { name: 'forbidden' };
+    }
+  }
+
+  if (to.meta.requiredPermission) {
+    await authStore.fetchUser();
+    const user = JSON.parse(localStorage.getItem("na_user") || "{}");
+    if (!user?.permissions?.includes(to.meta.requiredPermission)) {
       return { name: 'forbidden' };
     }
   }

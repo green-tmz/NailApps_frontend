@@ -5,7 +5,7 @@ import type { LoginData, RegisterData, User } from "@/types";
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     // user: null as User | null,
-    user: localStorage.getItem("na_user") as User | null,
+    user: localStorage.getItem("na_user") ? JSON.parse(localStorage.getItem("na_user")!) as User : null,
     token: localStorage.getItem("na_token") || null,
     isLoading: false,
     error: null as string | null,

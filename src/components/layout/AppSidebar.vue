@@ -48,7 +48,7 @@
     <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
       <nav class="mb-6">
         <div class="flex flex-col gap-4">
-          <div v-for="(menuGroup, groupIndex) in menuGroups" :key="groupIndex">
+          <div v-for="(menuGroup, groupIndex) in filteredMenuGroups" :key="groupIndex">
             <h2
               :class="[
                 'mb-4 text-xs uppercase flex leading-[20px] text-gray-400',
@@ -210,7 +210,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import {
@@ -232,10 +232,23 @@ import {
 import SidebarWidget from "./SidebarWidget.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 import { useSidebar } from "@/composables/useSidebar";
+import { useAuthStore } from '@/stores/auth.js'
 
+const authStore = useAuthStore();
 const route = useRoute();
 
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
+
+onMounted(async () => {
+  if (authStore.isAuthenticated && !authStore.user) {
+    await authStore.fetchUser();
+  }
+});
+
+const hasPermission = (requiredPermission) => {
+  if (!authStore.user?.permissions) return false;
+  return authStore.user.permissions.includes(requiredPermission);
+};
 
 const menuGroups = [
   {
@@ -244,37 +257,44 @@ const menuGroups = [
       {
         icon: HomeIcon,
         name: "Панель управления",
-        path: "/"
+        path: "/",
+        requiredPermission: "view dashboard"
       },
       {
         icon: CalenderIcon,
         name: "Calendar",
         path: "/calendar",
+        requiredPermission: "view calendar"
       },
       {
         icon: BoxCubeIcon,
         name: "Клиенты",
         path: "/clients",
+        requiredPermission: "view clients"
       },
       {
         icon: BoxCubeIcon,
         name: "Расписание",
         path: "/schedule",
+        requiredPermission: "view schedule"
       },
       {
         icon: BoxCubeIcon,
         name: "Услуги",
         path: "/services",
+        requiredPermission: "view services"
       },
       {
         icon: BoxCubeIcon,
         name: "Специализации",
         path: "/specializations",
+        requiredPermission: "view specializations"
       },
       {
         icon: BoxCubeIcon,
         name: "Финансы",
         path: "/finance",
+        requiredPermission: "view finance"
       },
     ],
   },
@@ -283,12 +303,22 @@ const menuGroups = [
     items: [
       {
         icon: BoxCubeIcon,
-        name: "settings",
-        path: "/Настройки",
+        name: "Настройки",
+        path: "/settings",
+        requiredPermission: "view settings"
       },
     ],
   },
 ];
+
+const filteredMenuGroups = computed(() => {
+  return menuGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item =>
+      !item.requiredPermission || hasPermission(item.requiredPermission)
+    )
+  })).filter(group => group.items.length > 0); // Удаляем пустые группы
+});
 
 const isActive = (path) => route.path === path;
 
@@ -298,7 +328,7 @@ const toggleSubmenu = (groupIndex, itemIndex) => {
 };
 
 const isAnySubmenuRouteActive = computed(() => {
-  return menuGroups.some((group) =>
+  return filteredMenuGroups.value.some((group) =>
     group.items.some(
       (item) =>
         item.subItems && item.subItems.some((subItem) => isActive(subItem.path))
@@ -311,10 +341,11 @@ const isSubmenuOpen = (groupIndex, itemIndex) => {
   return (
     openSubmenu.value === key ||
     (isAnySubmenuRouteActive.value &&
-      menuGroups[groupIndex].items[itemIndex].subItems?.some((subItem) =>
+      filteredMenuGroups.value[groupIndex].items[itemIndex].subItems?.some((subItem) =>
         isActive(subItem.path)
-      ))
-  );
+      )
+    )
+  )
 };
 
 const startTransition = (el) => {

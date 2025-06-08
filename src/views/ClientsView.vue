@@ -2,7 +2,10 @@
   <div>
     <PageBreadcrumb :pageTitle="currentPageTitle" />
     <div class="actions">
-      <button @click="showAddClientModal = true" class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+      <button
+        v-if="hasAddClientPermission"
+        @click="showAddClientModal = true"
+        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
         Добавить клиента
       </button>
     </div>
@@ -158,6 +161,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useClientsStore } from '@/stores/clients'
+import { useAuthStore } from '@/stores/auth'
 import ClientsList from '@/components/clients/ClientsList.vue'
 import Modal from '@/components/clients/ClientForm.vue'
 import type { Client } from '@/types'
@@ -168,11 +172,16 @@ import { useToast } from 'vue-toastification';
 import 'flatpickr/dist/flatpickr.css'
 
 const clientsStore = useClientsStore()
+const authStore = useAuthStore()
 const toast = useToast()
 const clients = computed(() => clientsStore.clients)
 
 const showAddClientModal = ref(false)
 const currentPageTitle = ref('Клиенты')
+
+const hasAddClientPermission = computed(() => {
+  return authStore.user?.permissions?.includes("add client") ?? false
+})
 
 const flatpickrConfig = {
   dateFormat: 'd.m.Y',

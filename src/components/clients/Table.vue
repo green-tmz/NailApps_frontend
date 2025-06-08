@@ -43,13 +43,19 @@
                 <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ client.email }}</p>
               </td>
               <td class="px-5 py-4 sm:px-6">
-                <button @click="$emit('edit', client)" class="icon-button edit">
+                <button
+                  v-if="hasEditClientPermission"
+                  @click="$emit('edit', client)"
+                  class="icon-button edit">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 30 30" fill="none" stroke="#4a6baf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
                 </button>
-                <button @click="$emit('delete', client.id)" class="icon-button delete">
+                <button
+                  v-if="hasDeleteClientPermission"
+                  @click="$emit('delete', client.id)"
+                  class="icon-button delete">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 30 30" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -75,12 +81,24 @@
 
 <script setup lang="ts">
 import type { Client } from '@/types'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth.ts'
 
 defineProps<{
   clients: Client[]
 }>()
 
 defineEmits(['edit', 'delete'])
+
+const authStore = useAuthStore()
+
+const hasEditClientPermission = computed(() => {
+  return authStore.user?.permissions?.includes("edit client") ?? false
+})
+
+const hasDeleteClientPermission = computed(() => {
+  return authStore.user?.permissions?.includes("delete client") ?? false
+})
 
 const formatPhone = (phone: string) => {
   if (!phone) return ''
