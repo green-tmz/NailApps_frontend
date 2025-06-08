@@ -139,8 +139,12 @@ const handleDeleteSpecialization = (id: number) => {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        await SpecializationStore.deleteSpecialization(id)
-        toast.success("Специализация успешно удалена");
+        const res = await SpecializationStore.deleteSpecialization(id)
+        if (res.code != 200) {
+          toast.error(res.message);
+        } else {
+          toast.success(res.message);
+        }
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         toast.error("Упс! Что-то пошло не так");

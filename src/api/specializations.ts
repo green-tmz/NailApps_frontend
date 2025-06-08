@@ -17,5 +17,6 @@ export const updateSpecialization = async (id: number, name: string): Promise<Sp
 }
 
 export const deleteSpecialization = async (id: number): Promise<void> => {
-  await api.delete('/specializations/'+id)
+  const response = await api.delete('/specializations/'+id)
+  return response.data
 }
