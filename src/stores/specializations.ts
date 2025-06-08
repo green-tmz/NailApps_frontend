@@ -70,9 +70,12 @@ export const useSpecializationsStore = defineStore('specializations', {
     async deleteSpecialization(id: number) {
       try {
         this.isLoading = true
-        await deleteSpecialization(id)
-        this.specializations = this.specializations.filter(spec => spec.id !== id)
+        const deleteSpec = await deleteSpecialization(id)
+        if (deleteSpec.code == 200) {
+          this.specializations = this.specializations.filter(spec => spec.id !== id)
+        }
         this.error = null
+        return deleteSpec
       } catch (error: any) {
         this.error = error.response?.data?.message || error.message
         console.error('Ошибка при удалении специализации:', error)
