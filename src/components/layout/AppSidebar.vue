@@ -144,23 +144,22 @@
                     "
                   >
                     <ul class="mt-2 space-y-1 ml-9">
-                      <li v-for="subItem in item.subItems" :key="subItem.name">
-                        <router-link
-                          :to="subItem.path"
-                          :class="[
+                      <li v-for="subItem in item.subItems"
+                          :key="subItem.name"
+                      >
+                        <template v-if="!subItem.requiredPermission || hasPermission(subItem.requiredPermission)">
+                          <router-link
+                            :to="subItem.path"
+                            :class="[
                             'menu-dropdown-item',
                             {
-                              'menu-dropdown-item-active': isActive(
-                                subItem.path
-                              ),
-                              'menu-dropdown-item-inactive': !isActive(
-                                subItem.path
-                              ),
+                              'menu-dropdown-item-active': isActive(subItem.path),
+                              'menu-dropdown-item-inactive': !isActive(subItem.path),
                             },
                           ]"
-                        >
-                          {{ subItem.name }}
-                          <span class="flex items-center gap-1 ml-auto">
+                          >
+                            {{ subItem.name }}
+                            <span class="flex items-center gap-1 ml-auto">
                             <span
                               v-if="subItem.new"
                               :class="[
@@ -177,24 +176,9 @@
                             >
                               new
                             </span>
-                            <span
-                              v-if="subItem.pro"
-                              :class="[
-                                'menu-dropdown-badge',
-                                {
-                                  'menu-dropdown-badge-active': isActive(
-                                    subItem.path
-                                  ),
-                                  'menu-dropdown-badge-inactive': !isActive(
-                                    subItem.path
-                                  ),
-                                },
-                              ]"
-                            >
-                              pro
-                            </span>
                           </span>
-                        </router-link>
+                          </router-link>
+                        </template>
                       </li>
                     </ul>
                   </div>
@@ -252,7 +236,7 @@ const hasPermission = (requiredPermission) => {
 
 const menuGroups = [
   {
-    title: "Menu",
+    title: "Основное",
     items: [
       {
         icon: HomeIcon,
@@ -286,12 +270,6 @@ const menuGroups = [
       },
       {
         icon: BoxCubeIcon,
-        name: "Специализации",
-        path: "/specializations",
-        requiredPermission: "view specializations"
-      },
-      {
-        icon: BoxCubeIcon,
         name: "Финансы",
         path: "/finance",
         requiredPermission: "view finance"
@@ -299,13 +277,34 @@ const menuGroups = [
     ],
   },
   {
-    title: "Others",
+    title: "Дополнительное",
     items: [
       {
         icon: BoxCubeIcon,
         name: "Настройки",
-        path: "/settings",
-        requiredPermission: "view settings"
+        requiredPermission: "view settings",
+        subItems: [
+          {
+            name: "Специализации",
+            path: "/specializations",
+            requiredPermission: "view specializations"
+          },
+          {
+            name: "Роли",
+            path: "/roles",
+            requiredPermission: "view roles"
+          },
+          {
+            name: "Права",
+            path: "/permissions",
+            requiredPermission: "view permissions"
+          },
+          {
+            name: "Пользователи",
+            path: "/users",
+            requiredPermission: "view users"
+          },
+        ]
       },
     ],
   },
@@ -314,9 +313,19 @@ const menuGroups = [
 const filteredMenuGroups = computed(() => {
   return menuGroups.map(group => ({
     ...group,
-    items: group.items.filter(item =>
-      !item.requiredPermission || hasPermission(item.requiredPermission)
-    )
+    items: group.items
+      .filter(item => !item.requiredPermission || hasPermission(item.requiredPermission))
+      .map(item => {
+        if (!item.subItems) return item;
+
+        return {
+          ...item,
+          subItems: item.subItems.filter(
+            subItem => !subItem.requiredPermission || hasPermission(subItem.requiredPermission)
+          )
+        };
+      })
+      .filter(item => !item.subItems || item.subItems.length > 0) // Удаляем пункты с пустыми подменю
   })).filter(group => group.items.length > 0); // Удаляем пустые группы
 });
 
