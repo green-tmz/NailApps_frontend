@@ -26,8 +26,8 @@ export interface Master extends User {
 }
 
 export interface Specialization {
-  id: number
-  name: string
+  name: string,
+  description: string
 }
 
 export interface Permission {
