@@ -1,22 +1,18 @@
 <template>
-  <div>
-    <PageBreadcrumb :pageTitle="currentPageTitle" />
-    <div class="actions">
-      <button
-        v-if="hasAddSpecializationPermission"
-        @click="showAddSpecializationModal = true"
-        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-        Добавить специализацию
-      </button>
-    </div>
+  <div class="space-y-5 sm:space-y-6">
+    <ComponentCard title="Специализация">
+      <BasicTableOne
+        :specializations="specializations"
+        @edit="handleEdiSpecialization"
+        @delete="handleDeleteSpecialization" />
+    </ComponentCard>
   </div>
 
-  <SpecializationList :specializations="specializations" />
-  <Modal v-if="showAddSpecializationModal" @close="showAddSpecializationModal = false">
+  <Modal v-if="showEditSpecializationModal" @close="showEditSpecializationModal = false">
     <template #body>
       <div class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
         <!-- close btn -->
-        <button @click="showAddSpecializationModal = false" class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300">
+        <button @click="showEditSpecializationModal = false" class="transition-color absolute right-5 top-5 z-999 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-700 dark:bg-white/[0.05] dark:text-gray-400 dark:hover:bg-white/[0.07] dark:hover:text-gray-300">
           <svg
             class="fill-current"
             width="24"
@@ -35,22 +31,22 @@
         </button>
         <div class="px-2 pr-14">
           <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-            Добавить специализацию
+            Редактировать специализацию
           </h4>
         </div>
         <form class="flex flex-col" @submit.prevent="handleSubmitSpecializationt">
           <div class="px-2 overflow-y-auto custom-scrollbar">
-            <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-1">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
               <div>
                 <label for="first_name" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                  Имя<span class="text-error-500">*</span>
+                  Название<span class="text-error-500">*</span>
                 </label>
                 <input
                   type="text"
                   id="first_name"
                   v-model="formData.name"
                   required
-                  placeholder="Введите название"
+                  placeholder="Введите имя"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 />
               </div>
@@ -70,21 +66,21 @@
                 </div>
               </div>
             </div>
-            <div class="flex items-center gap-3 mt-6 lg:justify-end">
-              <button
-                @click="showAddSpecializationModal = false"
-                type="button"
-                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
-              >
-                Закрыть
-              </button>
-              <button
-                type="submit"
-                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
-              >
-                Сохранить
-              </button>
-            </div>
+          </div>
+          <div class="flex items-center gap-3 mt-6 lg:justify-end">
+            <button
+              @click="showEditSpecializationModal = false"
+              type="button"
+              class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto"
+            >
+              Закрыть
+            </button>
+            <button
+              type="submit"
+              class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto"
+            >
+              Сохранить
+            </button>
           </div>
         </form>
       </div>
@@ -93,52 +89,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useSpecializationsStore } from '@/stores/specializations'
-import { useAuthStore } from '@/stores/auth'
-import SpecializationList from '@/components/specializations/SpecializationList.vue'
-import Modal from '@/components/specializations/SpecializationForm.vue'
+import { ref} from 'vue'
 import type { Specialization } from '@/types'
-import PageBreadcrumb from '@/components/common/PageBreadcrumb.vue'
-import { useToast } from 'vue-toastification';
+import ComponentCard from "@/components/common/ComponentCard.vue";
+import BasicTableOne from "./Table.vue";
+import { useSpecializationsStore } from '@/stores/specializations'
+import Swal from 'sweetalert2';
+import { useToast } from 'vue-toastification'
+import Modal from '@/components/specializations/SpecializationForm.vue'
 
-const specializationsStore = useSpecializationsStore()
-const authStore = useAuthStore()
 const toast = useToast()
-const specializations = computed(() => specializationsStore.specializations)
 
-const showAddSpecializationModal = ref(false)
-const currentPageTitle = ref('Специализация')
-
-const hasAddSpecializationPermission = computed(() => {
-  return authStore.user?.permissions?.includes("add specialization") ?? false
-})
+defineProps<{
+  specializations: Specialization[]
+}>()
 
 const formData = ref<Specialization>({
   name: '',
   description: ''
 })
+const showEditSpecializationModal = ref(false)
+const SpecializationStore = useSpecializationsStore()
 
-onMounted(async () => {
-  await specializationsStore.fetchSpecializations()
-})
+const handleEdiSpecialization = (specialization: any) => {
+  formData.value = { ...specialization }
+  showEditSpecializationModal.value = true
+}
 
 const handleSubmitSpecializationt = async () => {
   try {
-    await specializationsStore.createSpecialization(formData.value)
-    showAddSpecializationModal.value = false
+    await SpecializationStore.updateSpecialization(formData.value.id, formData.value)
     formData.value = ""
-    toast.success("Специализация успешно добавлена");
+    showEditSpecializationModal.value = false
+    toast.success("Специализация успешно обновлена");
   } catch (e) {
     toast.error("Упс! Что-то пошло не так");
   }
 }
-</script>
 
-<style scoped>
-.actions {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: flex-end;
+const handleDeleteSpecialization = (id: number) => {
+  Swal.fire({
+    title: 'Удаление специализации',
+    text: "Вы уверены, что хотите удалить эту специализацию?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Да'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await SpecializationStore.deleteSpecialization(id)
+        toast.success("Специализация успешно удалена");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        toast.error("Упс! Что-то пошло не так");
+      }
+    }
+  });
 }
-</style>
+</script>

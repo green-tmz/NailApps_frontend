@@ -67,7 +67,7 @@ export const useSpecializationsStore = defineStore('specializations', {
         this.isLoading = false
       }
     },
-    async removeSpecialization(id: number) {
+    async deleteSpecialization(id: number) {
       try {
         this.isLoading = true
         await deleteSpecialization(id)
