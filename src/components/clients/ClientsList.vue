@@ -182,7 +182,7 @@ const formData = ref<Client>({
 })
 
 const flatpickrConfig = {
-  dateFormat: 'd.m.Y',
+  dateFormat: 'Y-m-d',
   altInput: true,
   altFormat: 'd.m.Y',
   wrap: true,
@@ -202,7 +202,7 @@ const handleSubmitClient = async () => {
     await clientsStore.updateClient(formData.value.id, formData.value)
     formData.value = ""
     showEditClientModal.value = false
-    toast.success("Клиент успешно добавлен");
+    toast.success("Клиент успешно обновлен");
   } catch (e) {
     toast.error("Упс! Что-то пошло не так");
   }
