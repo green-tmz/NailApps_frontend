@@ -7,6 +7,7 @@ export interface User {
   phone: string
   role: string
   specializations?: Specialization[]
+  permissions?: Permission[]
 }
 
 export interface Client {
@@ -26,6 +27,10 @@ export interface Master extends User {
 
 export interface Specialization {
   id: number
+  name: string
+}
+
+export interface Permission {
   name: string
 }
 
