@@ -176,9 +176,6 @@ const authStore = useAuthStore()
 const toast = useToast()
 const services = computed(() => servicesStore.services)
 const specializations = computed(() => specializationsStore.specializations)
-// const specializations = specializationsStore.specializations
-
-console.log(specializations)
 
 const showAddServiceModal = ref(false)
 const currentPageTitle = ref('Услуги')

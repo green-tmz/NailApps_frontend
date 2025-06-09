@@ -157,7 +157,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import type { Service, Specialization } from '@/types'
 import ComponentCard from "@/components/common/ComponentCard.vue";
 import BasicTableOne from "./Table.vue";
@@ -188,8 +188,7 @@ const servicesStore = useServicesStore()
 
 const handleEditService = (service: any) => {
   formData.value = {
-    ...service,
-    spec_id: service.specialization_id
+    ...service
   }
   showEditServiceModal.value = true
 }
