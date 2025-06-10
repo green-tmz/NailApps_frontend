@@ -56,12 +56,11 @@
                   <select
                     v-model="formData.specialization_id"
                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                    :class="{ 'text-gray-800 dark:text-white/90': formData.specialization.id }"
+                    :class="{ 'text-gray-800 dark:text-white/90': formData.specialization_id }"
                   >
                     <option v-for="spec in specializations"
                             :key="spec.id"
                             :value="spec.id"
-                            :selected="formData.specialization.id == spec.id"
                             class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
                       {{ spec.name }}
                     </option>
@@ -99,6 +98,7 @@
                   id="duration"
                   step="10"
                   min="0"
+                  required
                   v-model="formData.duration"
                   placeholder="Введите длительность"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
@@ -113,6 +113,9 @@
                   type="number"
                   required
                   id="price"
+                  @input="formatPrice"
+                  step="0.01"
+                  min="0"
                   v-model="formData.price"
                   placeholder="Введите цену"
                   class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
@@ -186,9 +189,18 @@ const showEditServiceModal = ref(false)
 
 const servicesStore = useServicesStore()
 
+const formatPrice = (e) => {
+  let value = e.target.value;
+  if (value.includes('.')) {
+    e.target.value = value.substring(0, value.indexOf('.') + 3);
+  }
+  formData.value.price = parseFloat(e.target.value) || 0;
+}
+
 const handleEditService = (service: any) => {
   formData.value = {
-    ...service
+    ...service,
+    specialization_id: service.specialization.id
   }
   showEditServiceModal.value = true
 }
