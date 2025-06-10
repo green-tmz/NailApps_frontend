@@ -35,7 +35,6 @@ export interface Permission {
 }
 
 export interface Service {
-  id: number
   specialization_id: number
   master_id: number
   name: string
